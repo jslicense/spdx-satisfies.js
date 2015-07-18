@@ -1,7 +1,7 @@
 {
   "name": "spdx-satisfies",
   "description": "test whether SPDX expressions satisfy licensing criteria",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
   "dependencies": {
     "spdx": "0.4.x",
