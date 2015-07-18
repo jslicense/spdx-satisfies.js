@@ -1,0 +1,16 @@
+var satisfies = require('./')
+
+require('tape')(function(test) {
+  test.equal(satisfies('MIT', 'MIT'), true)
+  test.equal(satisfies('MIT', '(ISC OR MIT)'), true)
+  test.equal(satisfies('Zlib', '(ISC OR (MIT OR Zlib))'), true)
+  test.equal(satisfies('GPL-3.0', '(ISC OR MIT)'), false)
+  test.equal(satisfies('GPL-2.0', 'GPL-2.0+'), true)
+  test.equal(satisfies('GPL-3.0', 'GPL-2.0+'), true)
+  test.equal(satisfies('GPL-1.0', 'GPL-2.0+'), false)
+  test.equal(satisfies('GPL-2.0', 'GPL-2.0+ WITH Bison-exception-2.2'), false)
+  test.equal(satisfies('GPL-3.0 WITH Bison-exception-2.2', 'GPL-2.0+ WITH Bison-exception-2.2'), true)
+  test.equal(satisfies('(MIT OR GPL-2.0)', '(ISC OR MIT)'), true)
+  test.equal(satisfies('(MIT AND GPL-2.0)', '(MIT OR GPL-2.0)'), true)
+  test.equal(satisfies('(MIT AND GPL-2.0)', '(ISC OR GPL-2.0)'), false)
+  test.end() })
