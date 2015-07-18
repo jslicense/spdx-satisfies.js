@@ -1,5 +1,6 @@
 {
   "name": "spdx-satisfies",
+  "description": "test whether SPDX expressions satisfy licensing criteria",
   "version": "0.0.0",
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
   "dependencies": {
@@ -7,12 +8,12 @@
     "spdx-compare": "0.1.x"
   },
   "devDependencies": {
-    "jsmd": "^0.3.0"
+    "tape": "4.x"
   },
   "license": "MIT",
   "main": "spdx-satisfies.js",
   "repository": "kemitchell/spdx-satisfies.js",
   "scripts": {
-    "test": "jsmd README.md"
+    "test": "tape test.js"
   }
 }
