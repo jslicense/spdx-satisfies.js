@@ -11,6 +11,16 @@
     "jsmd-tape": "^0.1.0",
     "tape": "4.x"
   },
+  "keywords": [
+    "SPDX",
+    "law",
+    "legal",
+    "license",
+    "metadata",
+    "package",
+    "package.json",
+    "standards"
+  ],
   "license": "MIT",
   "main": "spdx-satisfies.js",
   "repository": "kemitchell/spdx-satisfies.js",
