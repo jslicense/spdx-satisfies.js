@@ -22,7 +22,6 @@
     "standards"
   ],
   "license": "MIT",
-  "main": "spdx-satisfies.js",
   "repository": "kemitchell/spdx-satisfies.js",
   "scripts": {
     "test": "jsmd-tape README.md | node"
