@@ -4,7 +4,7 @@
   "version": "0.1.1",
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
   "dependencies": {
-    "spdx": "0.4.x",
+    "spdx": "0.5.x",
     "spdx-compare": "0.1.x"
   },
   "devDependencies": {
