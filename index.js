@@ -1,4 +1,4 @@
-var spdx = require('spdx')
+var parse = require('spdx-expression-parse')
 var compare = require('spdx-compare')
 
 module.exports = (function() {
@@ -54,5 +54,5 @@ module.exports = (function() {
       return licensesAreCompatible(first, second) } }
 
   return function(first, second) {
-    return recurse(spdx.parse(first), spdx.parse(second)) } })()
+    return recurse(parse(first), parse(second)) } })()
 
