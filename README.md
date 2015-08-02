@@ -1,36 +1,28 @@
-Test whether SPDX expressions satisfy given licensing criteria
+```javascript
+var assert = require('assert')
+var satisfies = require('spdx-satisfies')
 
-```shellsession
-npm install --save spdx-satisfies
-```
+assert(satisfies('MIT', 'MIT'))
 
-In JavaScript:
+assert(satisfies('MIT', '(ISC OR MIT)'))
+assert(satisfies('Zlib', '(ISC OR (MIT OR Zlib))'))
+assert(!satisfies('GPL-3.0', '(ISC OR MIT)'))
 
-<!--js
-  var satisfies = require('./');
--->
+assert(satisfies('GPL-2.0', 'GPL-2.0+'))
+assert(satisfies('GPL-3.0', 'GPL-2.0+'))
+assert(!satisfies('GPL-1.0', 'GPL-2.0+'))
 
-```js
-satisfies('MIT', 'MIT') // => true
-
-satisfies('MIT', '(ISC OR MIT)') // => true
-satisfies('Zlib', '(ISC OR (MIT OR Zlib))') // => true
-satisfies('GPL-3.0', '(ISC OR MIT)') // => false
-
-satisfies('GPL-2.0', 'GPL-2.0+') // => true
-satisfies('GPL-3.0', 'GPL-2.0+') // => true
-satisfies('GPL-1.0', 'GPL-2.0+') // => false
-
-satisfies(
+assert(!satisfies(
   'GPL-2.0',
   'GPL-2.0+ WITH Bison-exception-2.2'
-) // => false
-satisfies(
+))
+
+assert(satisfies(
   'GPL-3.0 WITH Bison-exception-2.2',
   'GPL-2.0+ WITH Bison-exception-2.2'
-) // => true
+))
 
-satisfies('(MIT OR GPL-2.0)', '(ISC OR MIT)') // => true
-satisfies('(MIT AND GPL-2.0)', '(MIT OR GPL-2.0)') // => true
-satisfies('(MIT AND GPL-2.0)', '(ISC OR GPL-2.0)') // => false
+assert(satisfies('(MIT OR GPL-2.0)', '(ISC OR MIT)'))
+assert(satisfies('(MIT AND GPL-2.0)', '(MIT OR GPL-2.0)'))
+assert(!satisfies('(MIT AND GPL-2.0)', '(ISC OR GPL-2.0)'))
 ```

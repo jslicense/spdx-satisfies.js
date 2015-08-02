@@ -8,8 +8,7 @@
     "spdx-compare": "0.1.x"
   },
   "devDependencies": {
-    "jsmd-tape": "^0.1.0",
-    "tape": "4.x"
+    "defence-cli": "^1.0.1"
   },
   "keywords": [
     "SPDX",
@@ -24,6 +23,6 @@
   "license": "MIT",
   "repository": "kemitchell/spdx-satisfies.js",
   "scripts": {
-    "test": "jsmd-tape README.md | node"
+    "test": "defence -i javascript README.md | sed 's!spdx-satisfies!./!' | node"
   }
 }
