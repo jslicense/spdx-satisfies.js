@@ -10,6 +10,7 @@ assert(!satisfies('GPL-3.0', '(ISC OR MIT)'))
 
 assert(satisfies('GPL-2.0', 'GPL-2.0+'))
 assert(satisfies('GPL-3.0', 'GPL-2.0+'))
+assert(satisfies('GPL-1.0+', 'GPL-2.0+'))
 assert(!satisfies('GPL-1.0', 'GPL-2.0+'))
 
 assert(!satisfies(
