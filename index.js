@@ -1,5 +1,5 @@
-var parse = require('spdx-expression-parse')
 var compare = require('spdx-compare')
+var parse = require('spdx-expression-parse')
 var ranges = require('spdx-ranges')
 
 var rangesAreCompatible = function (first, second) {
