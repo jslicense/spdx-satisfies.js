@@ -1,17 +1,17 @@
 {
   "name": "spdx-satisfies",
   "description": "test whether SPDX expressions satisfy licensing criteria",
-  "version": "0.1.3",
+  "version": "3.0.0",
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
   "dependencies": {
     "spdx-compare": "^0.1.2",
-    "spdx-expression-parse": "^1.0.0",
+    "spdx-expression-parse": "^3.0.0",
     "spdx-ranges": "^1.0.1"
   },
   "devDependencies": {
-    "defence-cli": "^1.0.1",
+    "defence-cli": "^2.0.1",
     "replace-require-self": "^1.1.1",
-    "standard": "^7.1.2"
+    "standard": "^11.0.0"
   },
   "keywords": [
     "SPDX",
