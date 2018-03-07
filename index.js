@@ -7,8 +7,20 @@ var rangesAreCompatible = function (first, second) {
     first.license === second.license ||
     ranges.some(function (range) {
       return (
-        range.indexOf(first.license) > -1 &&
-        range.indexOf(second.license)
+        licenseInRange(first.license, range) &&
+        licenseInRange(second.license, range)
+      )
+    })
+  )
+}
+
+function licenseInRange (license, range) {
+  return (
+    range.indexOf(license) !== -1 ||
+    range.some(function (element) {
+      return (
+        Array.isArray(element) &&
+        element.indexOf(license) !== -1
       )
     })
   )
@@ -17,7 +29,8 @@ var rangesAreCompatible = function (first, second) {
 var identifierInRange = function (identifier, range) {
   return (
     identifier.license === range.license ||
-    compare.gt(identifier.license, range.license)
+    compare.gt(identifier.license, range.license) ||
+    compare.eq(identifier.license, range.license)
   )
 }
 
@@ -70,6 +83,30 @@ var recurse = function (first, second) {
   }
 }
 
+function normalizeGPLIdentifiers (argument) {
+  var license = argument.license
+  if (license) {
+    if (endsWith(license, '-or-later')) {
+      argument.license = license.replace('-or-later', '')
+      argument.plus = true
+    } else if (endsWith(license, '-only')) {
+      argument.license = license.replace('-or-later', '')
+      delete argument.plus
+    }
+  } else {
+    argument.left = normalizeGPLIdentifiers(argument.left)
+    argument.right = normalizeGPLIdentifiers(argument.right)
+  }
+  return argument
+}
+
+function endsWith (string, substring) {
+  return string.indexOf(substring) === string.length - 1
+}
+
 module.exports = function (first, second) {
-  return recurse(parse(first), parse(second))
+  return recurse(
+    normalizeGPLIdentifiers(parse(first)),
+    normalizeGPLIdentifiers(parse(second))
+  )
 }
