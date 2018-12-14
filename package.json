@@ -3,6 +3,10 @@
   "description": "test whether SPDX expressions satisfy licensing criteria",
   "version": "4.0.0",
   "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
+  "contributors": [
+    "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
+    "Dan Butvinik <butvinik@outlook.com>"
+  ],
   "dependencies": {
     "spdx-compare": "^1.0.0",
     "spdx-expression-parse": "^3.0.0",
