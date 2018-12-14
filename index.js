@@ -60,7 +60,14 @@ var licensesAreCompatible = function (first, second) {
 
 var recurseLeftAndRight = function (first, second) {
   var firstConjunction = first.conjunction
-  if (firstConjunction === 'and') {
+  var secondConjunction = second.conjunction
+
+  if (firstConjunction === 'and' && secondConjunction === 'and') {
+    return (
+      (recurse(first.left, second.left) && recurse(first.right, second.right)) ||
+      (recurse(first.left, second.right) && recurse(first.right, second.left))
+    )
+  } else if (firstConjunction === 'and') {
     return (
       recurse(first.left, second) &&
       recurse(first.right, second)
