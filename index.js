@@ -58,38 +58,6 @@ var licensesAreCompatible = function (first, second) {
   }
 }
 
-var recurseLeftAndRight = function (first, second) {
-  var firstConjunction = first.conjunction
-  var secondConjunction = second.conjunction
-
-  if (firstConjunction === 'and' && secondConjunction === 'and') {
-    return (
-      (recurse(first.left, second.left) && recurse(first.right, second.right)) ||
-      (recurse(first.left, second.right) && recurse(first.right, second.left))
-    )
-  } else if (firstConjunction === 'and') {
-    return (
-      recurse(first.left, second) &&
-      recurse(first.right, second)
-    )
-  } else if (firstConjunction === 'or') {
-    return (
-      recurse(first.left, second) ||
-      recurse(first.right, second)
-    )
-  }
-}
-
-var recurse = function (first, second) {
-  if (first.hasOwnProperty('conjunction')) {
-    return recurseLeftAndRight(first, second)
-  } else if (second.hasOwnProperty('conjunction')) {
-    return recurseLeftAndRight(second, first)
-  } else {
-    return licensesAreCompatible(first, second)
-  }
-}
-
 function normalizeGPLIdentifiers (argument) {
   var license = argument.license
   if (license) {
@@ -100,7 +68,7 @@ function normalizeGPLIdentifiers (argument) {
       argument.license = license.replace('-or-later', '')
       delete argument.plus
     }
-  } else {
+  } else if (argument.left && argument.right) {
     argument.left = normalizeGPLIdentifiers(argument.left)
     argument.right = normalizeGPLIdentifiers(argument.right)
   }
@@ -111,9 +79,54 @@ function endsWith (string, substring) {
   return string.indexOf(substring) === string.length - 1
 }
 
-module.exports = function (first, second) {
-  return recurse(
-    normalizeGPLIdentifiers(parse(first)),
-    normalizeGPLIdentifiers(parse(second))
-  )
+function licenseString(e) {
+  if (e.hasOwnProperty('noassertion')) return 'NOASSERTION'
+  if (e.license) return `${e.license}${e.plus ? '+' : ''}${e.exception ? ` WITH ${e.exception}` : ''}`
 }
+
+// Expand the given expression into an equivalent array where each member is an array of licenses AND'd 
+// together and the members are OR'd together. For example, `(MIT OR ISC) AND GPL-3.0` expands to 
+// `[[GPL-3.0 AND MIT], [ISC AND MIT]]`. Note that within each array of licenses, the entries are 
+// normalized (sorted) by license name.
+function expand(expression) {
+  return sort(Array.from(expandInner(expression)))
+}
+
+// Flatten the given expression into an array of all licenses mentioned in the expression.
+function flatten(expression) {
+  const expanded = Array.from(expandInner(expression))
+  const flattened = expanded.reduce((result, clause) => {
+    return { ...result, ...clause }
+  }, {})
+  return sort([flattened])[0]
+}
+
+function expandInner(expression) {
+  if (!expression.conjunction) return [{ [licenseString(expression)]: expression }]
+  if (expression.conjunction === 'or') return [...expandInner(expression.left), ...expandInner(expression.right)]
+  if (expression.conjunction === 'and') {
+    var left = expandInner(expression.left)
+    var right = expandInner(expression.right)
+    return left.reduce((result, l) => {
+      right.forEach(r => result.push({ ...l, ...r }))
+      return result
+    }, [])
+  }
+}
+
+function sort(licenseList) {
+  var sortedLicenseLists = licenseList.filter(e => Object.keys(e).length).map(e => Object.keys(e).sort())
+  return sortedLicenseLists.map((list, i) => list.map(license => licenseList[i][license]))
+}
+
+function isANDCompatible(one, two) {
+  return one.every(o => two.some(t => licensesAreCompatible(o, t)))
+}
+
+function satisfies(first, second) {
+  var one = expand(normalizeGPLIdentifiers(parse(first)))
+  var two = flatten(normalizeGPLIdentifiers(parse(second)))
+  return one.some(o => isANDCompatible(o, two))
+}
+
+module.exports = satisfies
