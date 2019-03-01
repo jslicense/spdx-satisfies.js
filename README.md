@@ -36,6 +36,8 @@ assert(satisfies('(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)', 'Apache-2.0 AND ISC
 assert(satisfies('(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)', 'Apache-2.0 OR ISC'))
 assert(satisfies('(MIT AND GPL-2.0)', '(MIT OR GPL-2.0)'))
 assert(satisfies('(MIT AND GPL-2.0)', '(GPL-2.0 AND MIT)'))
+assert(satisfies('MIT', '(GPL-2.0 OR MIT) AND (MIT OR ISC)'))
+assert(satisfies('MIT AND ICU', '(MIT AND GPL-2.0) OR (ISC AND (Apache-2.0 OR ICU))'))
 assert(!satisfies('(MIT AND GPL-2.0)', '(ISC OR GPL-2.0)'))
 assert(!satisfies('MIT AND (GPL-2.0 OR ISC)', 'MIT'))
 assert(!satisfies('(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)', 'MIT'))

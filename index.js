@@ -95,38 +95,44 @@ function expand(expression) {
 // Flatten the given expression into an array of all licenses mentioned in the expression.
 function flatten(expression) {
   const expanded = Array.from(expandInner(expression))
-  const flattened = expanded.reduce((result, clause) => {
-    return { ...result, ...clause }
+  const flattened = expanded.reduce(function (result, clause) {
+    return Object.assign(result, clause)
   }, {})
   return sort([flattened])[0]
 }
 
 function expandInner(expression) {
   if (!expression.conjunction) return [{ [licenseString(expression)]: expression }]
-  if (expression.conjunction === 'or') return [...expandInner(expression.left), ...expandInner(expression.right)]
+  if (expression.conjunction === 'or') return expandInner(expression.left).concat(expandInner(expression.right))
   if (expression.conjunction === 'and') {
     var left = expandInner(expression.left)
     var right = expandInner(expression.right)
-    return left.reduce((result, l) => {
-      right.forEach(r => result.push({ ...l, ...r }))
+    return left.reduce(function(result, l) {
+      right.forEach(function(r) { result.push(Object.assign({}, l, r)) }) 
       return result
     }, [])
   }
 }
 
 function sort(licenseList) {
-  var sortedLicenseLists = licenseList.filter(e => Object.keys(e).length).map(e => Object.keys(e).sort())
-  return sortedLicenseLists.map((list, i) => list.map(license => licenseList[i][license]))
+  var sortedLicenseLists = licenseList
+    .filter(function(e) { return Object.keys(e).length })
+    .map(function(e) { return Object.keys(e).sort() })
+  return sortedLicenseLists.map(function(list, i) { 
+    return list.map(function(license) { return licenseList[i][license] })
+  })
 }
 
 function isANDCompatible(one, two) {
-  return one.every(o => two.some(t => licensesAreCompatible(o, t)))
+  return one.every(function(o) {
+    return two.some(function(t) { return licensesAreCompatible(o, t ) })
+  })
 }
 
 function satisfies(first, second) {
   var one = expand(normalizeGPLIdentifiers(parse(first)))
   var two = flatten(normalizeGPLIdentifiers(parse(second)))
-  return one.some(o => isANDCompatible(o, two))
+  return one.some(function(o) { return isANDCompatible(o, two) })
 }
 
 module.exports = satisfies
