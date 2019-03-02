@@ -6,7 +6,7 @@
   "contributors": [
     "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com)",
     "Dan Butvinik <butvinik@outlook.com>",
-    "Jeff McAffer <jeffmcaffer@gmail.com>"    
+    "Jeff McAffer <jeffmcaffer@gmail.com>"
   ],
   "dependencies": {
     "spdx-compare": "^1.0.0",
