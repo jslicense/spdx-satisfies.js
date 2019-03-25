@@ -1,44 +1,195 @@
 ```javascript
 var assert = require('assert')
 var satisfies = require('spdx-satisfies')
+```
 
-assert(satisfies('MIT', 'MIT'))
+This package exports a single function of two arguments:
 
-assert(satisfies('MIT', '(ISC OR MIT)'))
-assert(satisfies('Zlib', '(ISC OR (MIT OR Zlib))'))
-assert(!satisfies('GPL-3.0', '(ISC OR MIT)'))
+1.  an Object representing an SPDX expression
 
-assert(satisfies('GPL-2.0', 'GPL-2.0+'))
-assert(satisfies('GPL-3.0', 'GPL-2.0+'))
-assert(satisfies('GPL-1.0+', 'GPL-2.0+'))
-assert(!satisfies('GPL-1.0', 'GPL-2.0+'))
-assert(satisfies('GPL-2.0-only', 'GPL-2.0-only'))
-assert(satisfies('GPL-3.0-only', 'GPL-2.0+'))
+2.  an Array of Objects, each in the form of a leaf in an SPDX expression data structure
 
-assert(!satisfies(
-  'GPL-2.0',
-  'GPL-2.0+ WITH Bison-exception-2.2'
+```javascript
+assert(
+  satisfies(
+    {license: 'MIT'},
+    [{license: 'MIT'}]
+  )
+)
+```
+
+The schema for SPDX expression data structures is the same returned by [spdx-expression-parse](https://www.npmjs.com/package/spdx-expression-parse).
+
+```javascript
+var parse = require('spdx-expression-parse')
+
+assert(satisfies(
+  parse('MIT'),
+  [parse('ISC'), parse('MIT')]
 ))
 
 assert(satisfies(
-  'GPL-3.0 WITH Bison-exception-2.2',
-  'GPL-2.0+ WITH Bison-exception-2.2'
+  {license: 'Zlib'},
+  [
+    {license: 'ISC'},
+    {license: 'MIT'},
+    {license: 'Zlib'}
+  ]
 ))
 
-assert(satisfies('(MIT OR GPL-2.0)', '(ISC OR MIT)'))
-assert(satisfies('(MIT AND GPL-2.0)', '(MIT AND GPL-2.0)'))
-assert(satisfies('MIT AND GPL-2.0 AND ISC', 'MIT AND GPL-2.0 AND ISC'))
-assert(satisfies('MIT AND GPL-2.0 AND ISC', 'ISC AND GPL-2.0 AND MIT'))
-assert(satisfies('(MIT OR GPL-2.0) AND ISC', 'MIT AND ISC'))
-assert(satisfies('MIT AND ISC', '(MIT OR GPL-2.0) AND ISC'))
-assert(satisfies('MIT AND ISC', '(MIT AND GPL-2.0) OR ISC'))
-assert(satisfies('(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)', 'Apache-2.0 AND ISC'))
-assert(satisfies('(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)', 'Apache-2.0 OR ISC'))
-assert(satisfies('(MIT AND GPL-2.0)', '(MIT OR GPL-2.0)'))
-assert(satisfies('(MIT AND GPL-2.0)', '(GPL-2.0 AND MIT)'))
-assert(satisfies('MIT', '(GPL-2.0 OR MIT) AND (MIT OR ISC)'))
-assert(satisfies('MIT AND ICU', '(MIT AND GPL-2.0) OR (ISC AND (Apache-2.0 OR ICU))'))
-assert(!satisfies('(MIT AND GPL-2.0)', '(ISC OR GPL-2.0)'))
-assert(!satisfies('MIT AND (GPL-2.0 OR ISC)', 'MIT'))
-assert(!satisfies('(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)', 'MIT'))
+assert(!satisfies(
+  {license: 'GPL-3.0'},
+  [
+    {license: 'ISC'},
+    {license: 'MIT'}
+  ]
+))
+
+
+assert(satisfies(
+  {license: 'GPL-2.0'},
+  [{license: 'GPL-2.0', plus: true}]
+))
+
+assert(satisfies(
+  {license: 'GPL-3.0'},
+  [{license: 'GPL-2.0', plus: true}]
+))
+
+assert(satisfies(
+  {license: 'GPL-1.0', plus: true},
+  [{license: 'GPL-2.0', plus: true}]
+))
+
+assert(!satisfies(
+  {license: 'GPL-1.0'},
+  [{license: 'GPL-2.0', plus: true}]
+))
+
+assert(satisfies(
+  {license: 'GPL-2.0-only'},
+  [{license: 'GPL-2.0-only'}]
+))
+
+assert(satisfies(
+  {license: 'GPL-3.0-only'},
+  [{license: 'GPL-2.0', plus: true}]
+))
+
+assert(!satisfies(
+  {license: 'GPL-2.0'},
+  [
+    {
+      license: 'GPL-2.0',
+      plus: true,
+      exception: 'Bison-exception-2.2'
+    }
+  ]
+))
+
+assert(satisfies(
+  {
+    license: 'GPL-3.0',
+    exception: 'Bison-exception-2.2'
+  },
+  [
+    {
+      license: 'GPL-2.0',
+      plus: true,
+      exception: 'Bison-exception-2.2'
+    }
+  ]
+))
+
+assert(satisfies(
+  // (MIT OR GPL-2.0)
+  {
+    left: {license: 'MIT'},
+    conjunction: 'or',
+    right: {license: 'GPL-2.0'}
+  },
+  [
+    {license: 'ISC'},
+    {license: 'MIT'}
+  ]
+))
+
+assert(satisfies(
+  // ((MIT OR Apache-2.0) AND (ISC OR GPL-2.0))
+  {
+    left: {
+      left: {license: 'MIT'},
+      conjunction: 'or',
+      right: {license: 'Apache-2.0'}
+    },
+    conjunction: 'and',
+    right: {
+      left: {license: 'ISC'},
+      conjunction: 'or',
+      right: {license: 'GPL-2.0'}
+    }
+  },
+  [
+    {license: 'Apache-2.0'},
+    {license: 'ISC'}
+  ]
+))
+
+assert(satisfies(
+  // (MIT AND GPL-2.0)
+  {
+    left: {license: 'MIT'},
+    conjunction: 'and',
+    right: {license: 'GPL-2.0'}
+  },
+  [
+    {license: 'MIT'},
+    {license: 'GPL-2.0'}
+  ]
+))
+
+assert(!satisfies(
+  // (MIT AND GPL-2.0)
+  {
+    left: {license: 'MIT'},
+    conjunction: 'and',
+    right: {license: 'GPL-2.0'}
+  },
+  [
+    {license: 'ISC'},
+    {license: 'GPL-2.0'}
+  ]
+))
+
+assert(!satisfies(
+  // (MIT AND (GPL-2.0 OR ISC))
+  {
+    left: {license: 'MIT'},
+    conjunction: 'and',
+    right: {
+      left: {license: 'GPL-2.0'},
+      conjunction: 'or',
+      right: {license: 'ISC'}
+    }
+  },
+  [{license: 'MIT'}]
+))
+
+assert(!satisfies(
+  // (MIT OR Apache-2.0) AND (ISC OR GPL-2.0)
+  {
+    left: {
+      left: {license: 'MIT'},
+      conjunction: 'or',
+      right: {license: 'Apache-2.0'}
+    },
+    conjunction: 'and',
+    right: {
+      left: {license: 'ISC'},
+      conjunction: 'or',
+      right: {license: 'GPL-2.0'}
+    }
+  },
+  [{license: 'MIT'}]
+))
 ```
