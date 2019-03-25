@@ -2,6 +2,14 @@ var compare = require('spdx-compare')
 var ranges = require('spdx-ranges')
 
 module.exports = function (first, second) {
+  if (!Array.isArray(second)) throw new Error('second argument must be an Array')
+  if (second.some(function (element) {
+    return !element.hasOwnProperty('license')
+  })) throw new Error('second argument must contain license expression AST leaves')
+  if (
+    !first.hasOwnProperty('license') &&
+    !first.hasOwnProperty('conjunction')
+  ) throw new Error('first argument must be a license expression AST')
   var terms = normalizeGPLIdentifiers(first)
   var whitelist = second.map(function (element) {
     return normalizeGPLIdentifiers(element)

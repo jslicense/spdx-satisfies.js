@@ -192,4 +192,24 @@ assert(!satisfies(
   },
   [{license: 'MIT'}]
 ))
+
+assert.throws(function () {
+  satisfies('MIT', [parse('MIT')])
+}, /first argument/)
+
+assert.throws(function () {
+  satisfies({invalid: 'AST'}, [parse('MIT')])
+}, /first argument/)
+
+assert.throws(function () {
+  satisfies(parse('MIT'), parse('MIT'))
+}, /second argument/)
+
+assert.throws(function () {
+  satisfies(parse('MIT'), parse('MIT'))
+}, /second argument/)
+
+assert.throws(function () {
+  satisfies(parse('MIT'), [{invalid: 'leaf'}])
+}, /second argument/)
 ```
