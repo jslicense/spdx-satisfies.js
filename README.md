@@ -192,7 +192,11 @@ assert(!satisfies(
   },
   [{license: 'MIT'}]
 ))
+```
 
+The exported function does a few naive type checks on arguments.  Do not rely on it for rigorous validation.
+
+```javascript
 assert.throws(function () {
   satisfies('MIT', [parse('MIT')])
 }, /first argument/)
