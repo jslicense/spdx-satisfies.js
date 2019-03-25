@@ -1,6 +1,21 @@
 var compare = require('spdx-compare')
-var parse = require('spdx-expression-parse')
 var ranges = require('spdx-ranges')
+
+module.exports = function (first, second) {
+  if (!Array.isArray(second)) throw new Error('second argument must be an Array')
+  if (second.some(function (element) {
+    return !element.hasOwnProperty('license')
+  })) throw new Error('second argument must contain license expression AST leaves')
+  if (
+    !first.hasOwnProperty('license') &&
+    !first.hasOwnProperty('conjunction')
+  ) throw new Error('first argument must be a license expression AST')
+  var terms = normalizeGPLIdentifiers(first)
+  var whitelist = second.map(function (element) {
+    return normalizeGPLIdentifiers(element)
+  })
+  return recurse(terms, whitelist)
+}
 
 var rangesAreCompatible = function (first, second) {
   return (
@@ -79,60 +94,17 @@ function endsWith (string, substring) {
   return string.indexOf(substring) === string.length - 1
 }
 
-function licenseString (e) {
-  if (e.hasOwnProperty('noassertion')) return 'NOASSERTION'
-  if (e.license) return `${e.license}${e.plus ? '+' : ''}${e.exception ? ` WITH ${e.exception}` : ''}`
-}
-
-// Expand the given expression into an equivalent array where each member is an array of licenses AND'd
-// together and the members are OR'd together. For example, `(MIT OR ISC) AND GPL-3.0` expands to
-// `[[GPL-3.0 AND MIT], [ISC AND MIT]]`. Note that within each array of licenses, the entries are
-// normalized (sorted) by license name.
-function expand (expression) {
-  return sort(Array.from(expandInner(expression)))
-}
-
-// Flatten the given expression into an array of all licenses mentioned in the expression.
-function flatten (expression) {
-  const expanded = Array.from(expandInner(expression))
-  const flattened = expanded.reduce(function (result, clause) {
-    return Object.assign(result, clause)
-  }, {})
-  return sort([flattened])[0]
-}
-
-function expandInner (expression) {
-  if (!expression.conjunction) return [{ [licenseString(expression)]: expression }]
-  if (expression.conjunction === 'or') return expandInner(expression.left).concat(expandInner(expression.right))
-  if (expression.conjunction === 'and') {
-    var left = expandInner(expression.left)
-    var right = expandInner(expression.right)
-    return left.reduce(function (result, l) {
-      right.forEach(function (r) { result.push(Object.assign({}, l, r)) })
-      return result
-    }, [])
+function recurse (terms, whitelist) {
+  var conjunction = terms.conjunction
+  if (!conjunction) {
+    return whitelist.some(function (whitelisted) {
+      return licensesAreCompatible(terms, whitelisted)
+    })
+  } else if (conjunction === 'or') {
+    return recurse(terms.left, whitelist) || recurse(terms.right, whitelist)
+  } else if (conjunction === 'and') {
+    return recurse(terms.left, whitelist) && recurse(terms.right, whitelist)
+  } else {
+    throw new Error('invalid terms')
   }
 }
-
-function sort (licenseList) {
-  var sortedLicenseLists = licenseList
-    .filter(function (e) { return Object.keys(e).length })
-    .map(function (e) { return Object.keys(e).sort() })
-  return sortedLicenseLists.map(function (list, i) {
-    return list.map(function (license) { return licenseList[i][license] })
-  })
-}
-
-function isANDCompatible (one, two) {
-  return one.every(function (o) {
-    return two.some(function (t) { return licensesAreCompatible(o, t) })
-  })
-}
-
-function satisfies (first, second) {
-  var one = expand(normalizeGPLIdentifiers(parse(first)))
-  var two = flatten(normalizeGPLIdentifiers(parse(second)))
-  return one.some(function (o) { return isANDCompatible(o, two) })
-}
-
-module.exports = satisfies
