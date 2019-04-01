@@ -28,9 +28,10 @@ function licenseInRange (license, range) {
 
 var identifierInRange = function (identifier, range) {
   return (
-    identifier.license === range.license ||
+    identifier.license &&
+    (identifier.license === range.license ||
     compare.gt(identifier.license, range.license) ||
-    compare.eq(identifier.license, range.license)
+    compare.eq(identifier.license, range.license))
   )
 }
 
