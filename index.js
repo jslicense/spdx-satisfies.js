@@ -94,8 +94,8 @@ function expand (expression) {
 
 // Flatten the given expression into an array of all licenses mentioned in the expression.
 function flatten (expression) {
-  const expanded = Array.from(expandInner(expression))
-  const flattened = expanded.reduce(function (result, clause) {
+  var expanded = Array.from(expandInner(expression))
+  var flattened = expanded.reduce(function (result, clause) {
     return Object.assign(result, clause)
   }, {})
   return sort([flattened])[0]
