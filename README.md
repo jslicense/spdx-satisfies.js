@@ -14,6 +14,10 @@ assert(satisfies('GPL-1.0+', 'GPL-2.0+'))
 assert(!satisfies('GPL-1.0', 'GPL-2.0+'))
 assert(satisfies('GPL-2.0-only', 'GPL-2.0-only'))
 assert(satisfies('GPL-3.0-only', 'GPL-2.0+'))
+assert(satisfies('LGPL-3.0-only', 'LGPL-3.0-or-later'))
+assert(satisfies('GPL-2.0', 'GPL-2.0+'))
+assert(satisfies('GPL-2.0-only', 'GPL-2.0+'))
+assert(satisfies('GPL-2.0', 'GPL-2.0-or-later'))
 
 assert(!satisfies(
   'GPL-2.0',
