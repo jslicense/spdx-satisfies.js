@@ -89,12 +89,12 @@ function licenseString (e) {
 // `[[GPL-3.0 AND MIT], [ISC AND MIT]]`. Note that within each array of licenses, the entries are
 // normalized (sorted) by license name.
 function expand (expression) {
-  return sort(Array.from(expandInner(expression)))
+  return sort(expandInner(expression))
 }
 
 // Flatten the given expression into an array of all licenses mentioned in the expression.
 function flatten (expression) {
-  var expanded = Array.from(expandInner(expression))
+  var expanded = expandInner(expression)
   var flattened = expanded.reduce(function (result, clause) {
     return Object.assign(result, clause)
   }, {})
