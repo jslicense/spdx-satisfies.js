@@ -76,7 +76,7 @@ function normalizeGPLIdentifiers (argument) {
 }
 
 function endsWith (string, substring) {
-  return string.indexOf(substring) === string.length - 1
+  return string.indexOf(substring) === string.length - substring.length
 }
 
 function licenseString (e) {
