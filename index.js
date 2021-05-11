@@ -28,9 +28,10 @@ function licenseInRange (license, range) {
 
 var identifierInRange = function (identifier, range) {
   return (
-    identifier.license === range.license ||
+    identifier.license &&
+    (identifier.license === range.license ||
     compare.gt(identifier.license, range.license) ||
-    compare.eq(identifier.license, range.license)
+    compare.eq(identifier.license, range.license))
   )
 }
 
@@ -129,7 +130,9 @@ function isANDCompatible (one, two) {
   })
 }
 
-function satisfies (first, second) {
+function satisfies (first, second, options) {
+  options = options || {}
+  parse = options.parse || parse
   var one = expand(normalizeGPLIdentifiers(parse(first)))
   var two = flatten(normalizeGPLIdentifiers(parse(second)))
   return one.some(function (o) { return isANDCompatible(o, two) })
