@@ -88,13 +88,13 @@ function licenseString (e) {
 // together and the members are OR'd together. For example, `(MIT OR ISC) AND GPL-3.0` expands to
 // `[[GPL-3.0 AND MIT], [ISC AND MIT]]`. Note that within each array of licenses, the entries are
 // normalized (sorted) by license name.
-function expand (expression) {
-  return sort(expandInner(expression))
+function expand (licenseExpression) {
+  return sort(expandInner(licenseExpression))
 }
 
-// Flatten the given expression into an array of all licenses mentioned in the expression.
-function flatten (expression) {
-  var expanded = expandInner(expression)
+// Flatten the given policy expression into an array of all licenses mentioned in the expression.
+function flatten (policyExpression) {
+  var expanded = expandInner(policyExpression)
   var flattened = expanded.reduce(function (result, clause) {
     return Object.assign(result, clause)
   }, {})
@@ -123,16 +123,16 @@ function sort (licenseList) {
   })
 }
 
-function isANDCompatible (one, two) {
-  return one.every(function (o) {
-    return two.some(function (t) { return licensesAreCompatible(o, t) })
+function isANDCompatible (expandedLicenseExpression, flattenedPolicy) {
+  return expandedLicenseExpression.every(function (o) {
+    return flattenedPolicy.some(function (t) { return licensesAreCompatible(o, t) })
   })
 }
 
-function satisfies (first, second) {
-  var one = expand(normalizeGPLIdentifiers(parse(first)))
-  var two = flatten(normalizeGPLIdentifiers(parse(second)))
-  return one.some(function (o) { return isANDCompatible(o, two) })
+function satisfies (licenseExpression, policyExpression) {
+  var expandedLicenseExpression = expand(normalizeGPLIdentifiers(parse(licenseExpression)))
+  var flattenedPolicy = flatten(normalizeGPLIdentifiers(parse(policyExpression)))
+  return expandedLicenseExpression.some(function (o) { return isANDCompatible(o, flattenedPolicy) })
 }
 
 module.exports = satisfies
