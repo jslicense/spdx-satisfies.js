@@ -19,6 +19,10 @@ assert(satisfies('GPL-2.0', 'GPL-2.0+'))
 assert(satisfies('GPL-2.0-only', 'GPL-2.0+'))
 assert(satisfies('GPL-2.0', 'GPL-2.0-or-later'))
 
+assert(satisfies('GFDL-1.1-invariants-or-later', 'GFDL-1.2-invariants-only'))
+assert(satisfies('GFDL-1.1-invariants-or-later', 'GFDL-1.2-invariants-or-later'))
+assert(!satisfies('GFDL-1.1-invariants-only', 'GFDL-1.2-invariants-or-later'))
+
 assert(!satisfies(
   'GPL-2.0',
   'GPL-2.0+ WITH Bison-exception-2.2'

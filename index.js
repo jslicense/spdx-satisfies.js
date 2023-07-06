@@ -61,11 +61,12 @@ var licensesAreCompatible = function (first, second) {
 function normalizeGPLIdentifiers (argument) {
   var license = argument.license
   if (license) {
+    var isGFDL = startsWith(license, 'GFDL-')
     if (endsWith(license, '-or-later')) {
-      argument.license = license.replace('-or-later', '')
+      if (!isGFDL) argument.license = license.replace('-or-later', '')
       argument.plus = true
     } else if (endsWith(license, '-only')) {
-      argument.license = license.replace('-only', '')
+      if (!isGFDL) argument.license = license.replace('-only', '')
       delete argument.plus
     }
   } else if (argument.left && argument.right) {
@@ -73,6 +74,14 @@ function normalizeGPLIdentifiers (argument) {
     argument.right = normalizeGPLIdentifiers(argument.right)
   }
   return argument
+}
+
+function startsWith (string, substring) {
+  return string.substring(0, substring.length) === substring
+}
+
+if (!startsWith('applesauce', 'apple')) {
+  throw new Error('bad impl')
 }
 
 function endsWith (string, substring) {
