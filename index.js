@@ -65,7 +65,7 @@ function normalizeGPLIdentifiers (argument) {
       argument.license = license.replace('-or-later', '')
       argument.plus = true
     } else if (endsWith(license, '-only')) {
-      argument.license = license.replace('-or-later', '')
+      argument.license = license.replace('-only', '')
       delete argument.plus
     }
   } else if (argument.left && argument.right) {
