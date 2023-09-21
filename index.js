@@ -2,7 +2,7 @@ var compare = require('spdx-compare')
 var parse = require('spdx-expression-parse')
 var ranges = require('spdx-ranges')
 
-var rangesAreCompatible = function (first, second) {
+function rangesAreCompatible (first, second) {
   return (
     first.license === second.license ||
     ranges.some(function (range) {
@@ -26,7 +26,7 @@ function licenseInRange (license, range) {
   )
 }
 
-var identifierInRange = function (identifier, range) {
+function identifierInRange (identifier, range) {
   return (
     identifier.license === range.license ||
     compare.gt(identifier.license, range.license) ||
@@ -34,7 +34,7 @@ var identifierInRange = function (identifier, range) {
   )
 }
 
-var licensesAreCompatible = function (first, second) {
+function licensesAreCompatible (first, second) {
   if (first.exception !== second.exception) {
     return false
   } else if (second.hasOwnProperty('license')) {
