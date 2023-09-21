@@ -81,7 +81,13 @@ function endsWith (string, substring) {
 
 function licenseString (e) {
   if (e.hasOwnProperty('noassertion')) return 'NOASSERTION'
-  if (e.license) return `${e.license}${e.plus ? '+' : ''}${e.exception ? ` WITH ${e.exception}` : ''}`
+  if (e.license) {
+    return (
+      e.license +
+      (e.plus ? '+' : '') +
+      (e.exception ? ('WITH ' + e.exception) : '')
+    )
+  }
 }
 
 // Expand the given expression into an equivalent array where each member is an array of licenses AND'd
