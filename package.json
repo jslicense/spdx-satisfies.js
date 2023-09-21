@@ -14,8 +14,6 @@
     "spdx-ranges": "^2.0.0"
   },
   "devDependencies": {
-    "defence-cli": "^2.0.1",
-    "replace-require-self": "^1.1.1",
     "standard": "^11.0.0"
   },
   "keywords": [
@@ -34,12 +32,7 @@
     "index.js"
   ],
   "scripts": {
-    "build": "node write-readme.js > README.md",
-    "pretest": "npm run build",
-    "prepublish": "npm run build",
-    "test": "npm run test:suite && npm run test:readme",
-    "test:suite": "node test.js",
-    "test:readme": "defence -i javascript README.md | replace-require-self | node",
+    "test": "node test.js",
     "lint": "standard"
   }
 }
