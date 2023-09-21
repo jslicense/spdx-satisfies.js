@@ -92,15 +92,6 @@ function expand (expression) {
   return sort(expandInner(expression))
 }
 
-// Flatten the given expression into an array of all licenses mentioned in the expression.
-function flatten (expression) {
-  var expanded = expandInner(expression)
-  var flattened = expanded.reduce(function (result, clause) {
-    return Object.assign(result, clause)
-  }, {})
-  return sort([flattened])[0]
-}
-
 function expandInner (expression) {
   if (!expression.conjunction) return [{ [licenseString(expression)]: expression }]
   if (expression.conjunction === 'or') return expandInner(expression.left).concat(expandInner(expression.right))
@@ -129,10 +120,15 @@ function isANDCompatible (one, two) {
   })
 }
 
-function satisfies (first, second) {
-  var one = expand(normalizeGPLIdentifiers(parse(first)))
-  var two = flatten(normalizeGPLIdentifiers(parse(second)))
-  return one.some(function (o) { return isANDCompatible(o, two) })
+function satisfies (spdxExpression, arrayOfLicenses) {
+  var parsedExpression = expand(normalizeGPLIdentifiers(parse(spdxExpression)))
+  var parsedLicenses = arrayOfLicenses.map(function (l) { return normalizeGPLIdentifiers(parse(l)) })
+  for (const parsed of parsedLicenses) {
+    if (parsed.hasOwnProperty('conjunction')) {
+      throw new Error('Approved licenses cannot be AND or OR expressions.')
+    }
+  }
+  return parsedExpression.some(function (o) { return isANDCompatible(o, parsedLicenses) })
 }
 
 module.exports = satisfies
