@@ -58,7 +58,7 @@ var licensesAreCompatible = function (first, second) {
   }
 }
 
-function normalizeGPLIdentifiers (argument) {
+function replaceGPLOnlyOrLaterWithRanges (argument) {
   var license = argument.license
   if (license) {
     if (endsWith(license, '-or-later')) {
@@ -69,8 +69,8 @@ function normalizeGPLIdentifiers (argument) {
       delete argument.plus
     }
   } else if (argument.left && argument.right) {
-    argument.left = normalizeGPLIdentifiers(argument.left)
-    argument.right = normalizeGPLIdentifiers(argument.right)
+    argument.left = replaceGPLOnlyOrLaterWithRanges(argument.left)
+    argument.right = replaceGPLOnlyOrLaterWithRanges(argument.right)
   }
   return argument
 }
@@ -121,8 +121,8 @@ function isANDCompatible (one, two) {
 }
 
 function satisfies (spdxExpression, arrayOfLicenses) {
-  var parsedExpression = expand(normalizeGPLIdentifiers(parse(spdxExpression)))
-  var parsedLicenses = arrayOfLicenses.map(function (l) { return normalizeGPLIdentifiers(parse(l)) })
+  var parsedExpression = expand(replaceGPLOnlyOrLaterWithRanges(parse(spdxExpression)))
+  var parsedLicenses = arrayOfLicenses.map(function (l) { return replaceGPLOnlyOrLaterWithRanges(parse(l)) })
   for (const parsed of parsedLicenses) {
     if (parsed.hasOwnProperty('conjunction')) {
       throw new Error('Approved licenses cannot be AND or OR expressions.')
