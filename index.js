@@ -114,9 +114,11 @@ function sort (licenseList) {
   })
 }
 
-function isANDCompatible (one, two) {
-  return one.every(function (o) {
-    return two.some(function (t) { return licensesAreCompatible(o, t) })
+function isANDCompatible (parsedExpression, parsedLicenses) {
+  return parsedExpression.every(function (element) {
+    return parsedLicenses.some(function (approvedLicense) {
+      return licensesAreCompatible(element, approvedLicense)
+    })
   })
 }
 
