@@ -6,46 +6,46 @@ var failed = false
 
 function write (string) { process.stdout.write(string) }
 
-function label (expression, approved) {
-  write('satisfies(' + JSON.stringify(expression) + ', ' + JSON.stringify(approved) + ')')
+function label (example) {
+  write('satisfies(' + JSON.stringify(example[0]) + ', ' + JSON.stringify(example[1]) + ')')
 }
 
-for (const [expression, approved] of examples.returnTrue) {
-  label(expression, approved)
+examples.returnTrue.forEach(function (example) {
+  label(example)
   try {
-    assert(satisfies(expression, approved) === true)
+    assert(satisfies(example[0], example[1]) === true)
   } catch (error) {
     failed = true
     write(' did not return true\n')
-    continue
+    return
   }
   write(' returned true\n')
-}
+})
 
 // False Examples
-for (const [expression, approved] of examples.returnFalse) {
-  label(expression, approved)
+examples.returnFalse.forEach(function (example) {
+  label(example)
   try {
-    assert(satisfies(expression, approved) === false)
+    assert(satisfies(example[0], example[1]) === false)
   } catch (error) {
     failed = true
     write(' did not return false\n')
-    continue
+    return
   }
   write(' returned false\n')
-}
+})
 
 // Invalid License Arrays
-for (const [expression, approved] of examples.throwErrors) {
-  label(expression, approved)
+examples.throwErrors.forEach(function (example) {
+  label(example)
   try {
-    satisfies(expression, approved)
+    satisfies(example[0], example[1])
   } catch (error) {
     write(' threw an exception\n')
-    continue
+    return
   }
   failed = true
   write(' did not throw an exception\n')
-}
+})
 
 process.exit(failed ? 1 : 0)
