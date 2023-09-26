@@ -92,15 +92,6 @@ function expand (expression) {
   return sort(expandInner(expression))
 }
 
-// Flatten the given expression into an array of all licenses mentioned in the expression.
-function flatten (expression) {
-  var expanded = expandInner(expression)
-  var flattened = expanded.reduce(function (result, clause) {
-    return Object.assign(result, clause)
-  }, {})
-  return sort([flattened])[0]
-}
-
 function expandInner (expression) {
   if (!expression.conjunction) return [{ [licenseString(expression)]: expression }]
   if (expression.conjunction === 'or') return expandInner(expression.left).concat(expandInner(expression.right))
@@ -123,16 +114,45 @@ function sort (licenseList) {
   })
 }
 
-function isANDCompatible (one, two) {
+/**
+ * Checks if all the licenses on the first argument are satisfied by any license on the second argument.
+ * @param {object[]} one - Source licenses.
+ * @param {object[]} two - Target licenses.
+ * @return {boolean} - Whether all the licenses on the first argument are satisfied by the target licenses.
+ */
+function isExpressionCompatible (one, two) {
+  if (one.length !== two.length) return false
   return one.every(function (o) {
     return two.some(function (t) { return licensesAreCompatible(o, t) })
   })
 }
 
+/**
+ * Checks whether any group of licenses satisfies any target group of licenses.
+ * e.g. [[MIT], [GPL-1.0+, Apache-2.0]] checked against
+ * [[ISC, GPL-2.0], [GPL-2.0, Apache-2.0]] will return true.
+ * @param {(object[])[]} one - Groups of licenses to be checked.
+ * @param {(object[])[]} two - Target groups of licenses.
+ * @return {boolean} - Whether any group of licenses in "one" satisfies any group of licenses of the "two" (the target).
+ */
+function anyExpressionCompatible (one, two) {
+  return one.some(function (o) {
+    return two.some(function (t) {
+      return isExpressionCompatible(o, t)
+    })
+  })
+}
+
+/**
+ * Check if "first" satisfies "second".
+ * @param {string} first - A valid SPDX expression.
+ * @param {string} second - A valid SPDX expression to be checked against.
+ * @return {boolean} - Whether "first" satisfies "second".
+ */
 function satisfies (first, second) {
   var one = expand(normalizeGPLIdentifiers(parse(first)))
-  var two = flatten(normalizeGPLIdentifiers(parse(second)))
-  return one.some(function (o) { return isANDCompatible(o, two) })
+  var two = expand(normalizeGPLIdentifiers(parse(second)))
+  return anyExpressionCompatible(one, two)
 }
 
 module.exports = satisfies
