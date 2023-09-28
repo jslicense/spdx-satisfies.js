@@ -146,12 +146,19 @@ function anyExpressionCompatible (one, two) {
 /**
  * Check if "first" satisfies "second".
  * @param {string} first - A valid SPDX expression.
- * @param {string} second - A valid SPDX expression to be checked against.
+ * @param {string|[]} second - A string with a SPDX expression or a list of licenses.
  * @return {boolean} - Whether "first" satisfies "second".
  */
 function satisfies (first, second) {
   var one = expand(normalizeGPLIdentifiers(parse(first)))
-  var two = expand(normalizeGPLIdentifiers(parse(second)))
+  var two
+  if (Array.isArray(second)) {
+    two = second.map(l => normalizeGPLIdentifiers(parse(l)))
+    if (two.some(l => !!l.conjunction)) throw new Error('AND and OR operator are not allowed')
+    two = two.map(l => [l])
+  } else {
+    two = expand(normalizeGPLIdentifiers(parse(second)))
+  }
   return anyExpressionCompatible(one, two)
 }
 
