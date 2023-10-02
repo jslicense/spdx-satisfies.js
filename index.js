@@ -146,7 +146,7 @@ function anyExpressionCompatible (one, two) {
 /**
  * Check if "first" satisfies "second".
  * @param {string} first - A valid SPDX expression.
- * @param {string|[]} second - A string with a SPDX expression or a list of licenses.
+ * @param {string|string[]} second - A string with a SPDX expression or a list of licenses.
  * @return {boolean} - Whether "first" satisfies "second".
  */
 function satisfies (first, second) {
