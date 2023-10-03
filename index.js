@@ -77,11 +77,7 @@ function normalizeGPLIdentifiers (argument) {
 }
 
 function startsWith (string, substring) {
-  return string.substring(0, substring.length) === substring
-}
-
-if (!startsWith('applesauce', 'apple')) {
-  throw new Error('bad impl')
+  return string.indexOf(substring) === 0
 }
 
 function endsWith (string, substring) {
