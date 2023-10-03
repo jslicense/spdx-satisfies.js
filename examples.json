@@ -1,0 +1,34 @@
+{
+  "returnTrue": [
+    ["MIT", ["MIT"]],
+    ["MIT", ["ISC", "MIT"]],
+    ["Zlib", ["ISC", "MIT", "Zlib"]],
+    ["GPL-2.0", ["GPL-2.0+"]],
+    ["GPL-3.0", ["GPL-2.0+"]],
+    ["GPL-1.0+", ["GPL-2.0+"]],
+    ["GPL-2.0-only", ["GPL-2.0-only"]],
+    ["GPL-3.0-only", ["GPL-2.0+"]],
+    ["LGPL-3.0-only", ["LGPL-3.0-or-later"]],
+    ["GPL-2.0", ["GPL-2.0+"]],
+    ["GPL-2.0-only", ["GPL-2.0+"]],
+    ["GPL-2.0", ["GPL-2.0-or-later"]],
+    ["GPL-3.0 WITH Bison-exception-2.2", ["GPL-2.0+ WITH Bison-exception-2.2"]],
+    ["(MIT OR GPL-2.0)", ["ISC", "MIT"]],
+    ["(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)", ["Apache-2.0", "ISC"]],
+    ["(MIT AND GPL-2.0)", ["MIT", "GPL-2.0"]]
+  ],
+
+  "returnFalse": [
+    ["GPL-3.0", ["ISC", "MIT"]],
+    ["GPL-1.0", ["GPL-2.0+"]],
+    ["GPL-2.0", ["GPL-2.0+ WITH Bison-exception-2.2"]],
+    ["(MIT AND GPL-2.0)", ["ISC", "GPL-2.0"]],
+    ["MIT AND (GPL-2.0 OR ISC)", ["MIT"]],
+    ["(MIT OR Apache-2.0) AND (ISC OR GPL-2.0)", ["MIT"]]
+  ],
+
+  "throwErrors": [
+    ["MIT AND ISC", ["(MIT OR GPL-2.0) AND ISC"]],
+    ["MIT AND ISC", ["(MIT AND GPL-2.0)", "ISC"]]
+  ]
+}

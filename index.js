@@ -2,7 +2,7 @@ var compare = require('spdx-compare')
 var parse = require('spdx-expression-parse')
 var ranges = require('spdx-ranges')
 
-var rangesAreCompatible = function (first, second) {
+function rangesAreCompatible (first, second) {
   return (
     first.license === second.license ||
     ranges.some(function (range) {
@@ -26,7 +26,7 @@ function licenseInRange (license, range) {
   )
 }
 
-var identifierInRange = function (identifier, range) {
+function identifierInRange (identifier, range) {
   return (
     identifier.license === range.license ||
     compare.gt(identifier.license, range.license) ||
@@ -34,7 +34,7 @@ var identifierInRange = function (identifier, range) {
   )
 }
 
-var licensesAreCompatible = function (first, second) {
+function licensesAreCompatible (first, second) {
   if (first.exception !== second.exception) {
     return false
   } else if (second.hasOwnProperty('license')) {
@@ -58,7 +58,7 @@ var licensesAreCompatible = function (first, second) {
   }
 }
 
-function normalizeGPLIdentifiers (argument) {
+function replaceGPLOnlyOrLaterWithRanges (argument) {
   var license = argument.license
   if (license) {
     if (endsWith(license, '-or-later')) {
@@ -69,8 +69,8 @@ function normalizeGPLIdentifiers (argument) {
       delete argument.plus
     }
   } else if (argument.left && argument.right) {
-    argument.left = normalizeGPLIdentifiers(argument.left)
-    argument.right = normalizeGPLIdentifiers(argument.right)
+    argument.left = replaceGPLOnlyOrLaterWithRanges(argument.left)
+    argument.right = replaceGPLOnlyOrLaterWithRanges(argument.right)
   }
   return argument
 }
@@ -81,7 +81,13 @@ function endsWith (string, substring) {
 
 function licenseString (e) {
   if (e.hasOwnProperty('noassertion')) return 'NOASSERTION'
-  if (e.license) return `${e.license}${e.plus ? '+' : ''}${e.exception ? ` WITH ${e.exception}` : ''}`
+  if (e.license) {
+    return (
+      e.license +
+      (e.plus ? '+' : '') +
+      (e.exception ? ('WITH ' + e.exception) : '')
+    )
+  }
 }
 
 // Expand the given expression into an equivalent array where each member is an array of licenses AND'd
@@ -90,15 +96,6 @@ function licenseString (e) {
 // normalized (sorted) by license name.
 function expand (expression) {
   return sort(expandInner(expression))
-}
-
-// Flatten the given expression into an array of all licenses mentioned in the expression.
-function flatten (expression) {
-  var expanded = expandInner(expression)
-  var flattened = expanded.reduce(function (result, clause) {
-    return Object.assign(result, clause)
-  }, {})
-  return sort([flattened])[0]
 }
 
 function expandInner (expression) {
@@ -123,16 +120,23 @@ function sort (licenseList) {
   })
 }
 
-function isANDCompatible (one, two) {
-  return one.every(function (o) {
-    return two.some(function (t) { return licensesAreCompatible(o, t) })
+function isANDCompatible (parsedExpression, parsedLicenses) {
+  return parsedExpression.every(function (element) {
+    return parsedLicenses.some(function (approvedLicense) {
+      return licensesAreCompatible(element, approvedLicense)
+    })
   })
 }
 
-function satisfies (first, second) {
-  var one = expand(normalizeGPLIdentifiers(parse(first)))
-  var two = flatten(normalizeGPLIdentifiers(parse(second)))
-  return one.some(function (o) { return isANDCompatible(o, two) })
+function satisfies (spdxExpression, arrayOfLicenses) {
+  var parsedExpression = expand(replaceGPLOnlyOrLaterWithRanges(parse(spdxExpression)))
+  var parsedLicenses = arrayOfLicenses.map(function (l) { return replaceGPLOnlyOrLaterWithRanges(parse(l)) })
+  for (const parsed of parsedLicenses) {
+    if (parsed.hasOwnProperty('conjunction')) {
+      throw new Error('Approved licenses cannot be AND or OR expressions.')
+    }
+  }
+  return parsedExpression.some(function (o) { return isANDCompatible(o, parsedLicenses) })
 }
 
 module.exports = satisfies
