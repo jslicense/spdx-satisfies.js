@@ -76,7 +76,9 @@ function replaceGPLOnlyOrLaterWithRanges (argument) {
 }
 
 function endsWith (string, substring) {
-  return string.indexOf(substring) === string.length - substring.length
+  const index = string.indexOf(substring)
+  if (index === -1) return false
+  return index === string.length - substring.length
 }
 
 function licenseString (e) {

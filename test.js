@@ -48,4 +48,21 @@ examples.throwErrors.forEach(function (example) {
   write(' did not throw an exception\n')
 })
 
+// https://github.com/jslicense/spdx-satisfies.js/issues/20
+for (const [spdx, approved] of [
+  ['LGPL-2.1', ['LGPL-3.0']],
+  ['LGPL-3.0', ['LGPL-2.1']],
+  ['AGPL-1.0', ['AGPL-3.0']],
+  ['CDDL-1.1', ['CDDL-1.0']],
+  ['GPL-2.0', ['GPL-3.0']]
+]) {
+  write('satisfies(' + JSON.stringify(spdx) + ', ' + JSON.stringify(approved) + ')')
+  if (satisfies(spdx, approved)) {
+    failed = true
+    write(' wrongly returned true\n')
+  } else {
+    write(' returned false\n')
+  }
+}
+
 process.exit(failed ? 1 : 0)
